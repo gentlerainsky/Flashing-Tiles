@@ -1,6 +1,6 @@
 # Flashing Tiles
 
-This is an attempt to implement "Steady State Visual Potential" experiment using Python. There are 2 associated folders.
+This is git remote add origin git@github.com:gentlerainsky/Flashing-Tiles.git. There are 2 associated folders.
 
 1. `pygame/` is implemented using [Pygame](https://github.com/pygame/pygame) as modeled from [gumpy-paradigms](https://github.com/gumpy-bci/gumpy-paradigms) However the update
 rate (frame rate) of Pygame is so slow that cause flickering rate too slow as shown in the report as high average error(%).
@@ -41,3 +41,5 @@ Average FPS: 76.17 fps
 ```
 
 Note: *Positive* average error denotes that the rates is *slower* while *negative* average error denote that the rate is *faster* than the specify frequency.
+
+![](demo.gif)
