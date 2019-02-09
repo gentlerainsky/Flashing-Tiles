@@ -5,6 +5,7 @@ import sys
 import time
 import numpy as np
 import atexit
+import math
 
 from pygame.locals import *
 
@@ -54,7 +55,7 @@ class Rect:
         self.statistic['check_frequency'].append(time_passed)
 
         if time_passed > self.period:
-            self.statistic['error'].append((time_passed - self.period) / self.period)
+            self.statistic['error'].append(math.fabs((time_passed - self.period) / self.period))
             self.last_flick = current_time
             self.flick()
 

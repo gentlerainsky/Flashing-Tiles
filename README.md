@@ -8,17 +8,17 @@ rate (frame rate) of Pygame is so slow that cause flickering rate too slow as sh
 ```
 On Exit Report
 Tile with 6.00 hz:
-Average Error: 66.16%
-Average Checking Period: 0.10 ms
+Average Absolute Error: 66.74%
+Average Checking Freqency: 0.10 ms
 Tile with 6.57 hz:
-Average Error: 80.91%
-Average Checking Period: 0.10 ms
+Average Absolute Error: 81.91%
+Average Checking Freqency: 0.10 ms
 Tile with 7.50 hz:
-Average Error: 4.39%
-Average Checking Period: 0.07 ms
+Average Absolute Error: 4.45%
+Average Checking Freqency: 0.07 ms
 Tile with 8.57 hz:
-Average Error: 19.28%
-Average Checking Period: 0.07 ms
+Average Absolute Error: 19.35%
+Average Checking Freqency: 0.07 ms
 ```
 
 2. `kivy/` is implemented using [Kivy](https://github.com/kivy/kivy). Kivy provides `schedule_interval` that is easier
@@ -27,19 +27,17 @@ to implement than Pygame and also provide faster update rate. The error rate is 
 ```
 On Exit Report
 Tile with 6.00 hz:
-Average Error: 0.41%
-Average FPS: 76.19 fps
+Average Absolute Error: 6.28%
+Average FPS: 76.67 fps
 Tile with 6.57 hz:
-Average Error: -3.46%
-Average FPS: 76.26 fps
+Average Absolute Error: 4.43%
+Average FPS: 76.63 fps
 Tile with 7.50 hz:
-Average Error: 0.59%
-Average FPS: 76.28 fps
+Average Absolute Error: 3.55%
+Average FPS: 76.65 fps
 Tile with 8.57 hz:
-Average Error: -3.97%
-Average FPS: 76.17 fps
+Average Absolute Error: 9.86%
+Average FPS: 76.62 fps
 ```
-
-Note: *Positive* average error denotes that the rates is *slower* while *negative* average error denote that the rate is *faster* than the specify frequency.
 
 ![](demo.gif)
