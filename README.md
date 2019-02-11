@@ -2,7 +2,7 @@
 
 This is an attempt to implement Flashing Tiles experiment to study "Steady State Visual Potential" using Python.
 
-## How experiment look like.
+## How the experiment looks like.
 ![](demo.gif)
 
 The experiment is implemented using [Kivy](https://github.com/kivy/kivy). Kivy provides `schedule_interval` that is easier
