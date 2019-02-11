@@ -6,17 +6,11 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-pygame = "*"
 numpy = "*"
-screeninfo = "*"
-sklearn = "*"
 pylsl = "*"
 vispy = "*"
 pyqt5 = "*"
 kivy = "*"
-pyaudio = "*"
-wave = "*"
-matplotlib = "*"
 
 [requires]
-python_version = "3.6.5"
+python_version = "3.7.2"

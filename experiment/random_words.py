@@ -43,4 +43,4 @@ I wanna take your soul tonight
 Baby please please tell me
 '''
 text = re.sub('[\.,"]', '', raw_text)
-words = list(filter(lambda s: len(s) > 0, re.split(r'\s', text)))
+words = list(set(filter(lambda s: len(s) > 0, re.split(r'\s', text))))

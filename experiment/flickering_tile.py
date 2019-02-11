@@ -1,49 +1,12 @@
-from kivy.app import App, Widget
+from kivy.app import Widget
 from kivy.clock import Clock
-from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.graphics.vertex_instructions import (Rectangle)
 from kivy.graphics.context_instructions import Color
-from kivy.core.text import Label as CoreLabel
-from kivy.config import Config
-import numpy as np
-import atexit
 import random
-from random_words import words
+from experiment.random_words import words
+from config import appearance, experiment_setup
 import math
-
-
-Config.set('graphics', 'maxfps', '100')
-print('Set max FPS to', Config.get('graphics', 'maxfps'))
-# Config.set('kivy', 'log_level', 'error')
-
-# Color value run from 0 to 1 (not 255)
-COLOR = {
-    'BLACK': (0, 0, 0),
-    'WHITE': (1, 1, 1),
-    'RED': (1, 0, 0),
-    'GREEN': (0, 1, 0),
-    'BLUE': (0, 0, 1)
-}
-
-# Color value run from 0 to 1 (not 255)
-LABEL_COLOR = {
-    'BLACK': [0, 0, 0, 1],
-    'WHITE': [1, 1, 1, 1],
-    'RED': [1, 0, 0, 1],
-    'GREEN': [0, 1, 0, 1],
-    'BLUE': [0, 0, 1, 1]
-}
-
-tile_settings = [
-    {'x': 'middle', 'y': 'top', 'hz': 6},
-    {'x': 'left', 'y': 'middle', 'hz': 6.57},
-    {'x': 'right', 'y': 'middle', 'hz': 7.5},
-    {'x': 'middle', 'y': 'bottom', 'hz': 8.57}
-]
-# app will terminate after specify time
-# set to 0 to disable auto exit
-EXIT_TIME = 10
 
 
 class FlickeringTile(Widget):
@@ -61,7 +24,7 @@ class FlickeringTile(Widget):
         self.hz = config['hz']
         self.padding = config.get('pad', 30)
         self.rect_event = Clock.schedule_interval(
-            lambda time_passed: self.flick(time_passed), 1 / self.rect_flip_freq
+            lambda time_passed: self.flick(time_passed), 1 / (self.rect_flip_freq + experiment_setup.caribrate_time)
         )
         self.change_text_event = Clock.schedule_interval(
             lambda time_passed: self.change_text(), 1
@@ -70,6 +33,7 @@ class FlickeringTile(Widget):
 
         # Use for further analysis on statistic of diff and fps
         self.statistic = {
+            'period': [],
             'error': [],
             'fps': []
         }
@@ -110,6 +74,7 @@ class FlickeringTile(Widget):
         self.label_1.text = self.label_2.text = random.choice(words)
 
     def flick(self, time_passed):
+        self.statistic['period'].append(time_passed * 2)
         self.statistic['error'].append(math.fabs((1 / time_passed - self.rect_flip_freq) / self.rect_flip_freq))
         fps = Clock.get_rfps()
         # Ignore FPS of a few first frames which are 0
@@ -122,26 +87,24 @@ class FlickeringTile(Widget):
         with self.canvas:
             self.canvas.clear()
             if self.state:
-                Color(*COLOR['WHITE'])
+                Color(*appearance.COLOR['WHITE'])
             else:
-                Color(*COLOR['BLACK'])
+                Color(*appearance.COLOR['BLACK'])
             Rectangle(pos=pos, size=size)
 
             if self.state:
                 self.remove_widget(self.label_2)
-                # self.label_1.text = str(randint(0, 100))
                 self.label_1.pos = label_pos
                 self.label_1.font_size = size[1] / 5
-                self.label_1.color = LABEL_COLOR['BLACK']
+                self.label_1.color = appearance.LABEL_COLOR['BLACK']
                 self.add_widget(
                     self.label_1
                 )
             else:
                 self.remove_widget(self.label_1)
-                # self.label_2.text =
                 self.label_2.pos = label_pos
                 self.label_2.font_size = size[1] / 5
-                self.label_2.color = LABEL_COLOR['WHITE']
+                self.label_2.color = appearance.LABEL_COLOR['WHITE']
                 self.add_widget(
                     self.label_2
                 )
@@ -151,37 +114,3 @@ class FlickeringTile(Widget):
                 self.label_frequency
             )
             self.state = not self.state
-
-
-class Main(App):
-    def build(self):
-        box = FloatLayout()
-        tiles = []
-        for setting in tile_settings:
-            tile = FlickeringTile(setting)
-            tiles.append(tile)
-            box.add_widget(tile)
-
-        # terminate app after 10 seconds
-        if EXIT_TIME != 0:
-            Clock.schedule_interval(lambda tmp: self.exit_app(), EXIT_TIME)
-
-        # Report some statistic of the FPS and Delay
-        # when this program is killed / exits
-        atexit.register(lambda: Main.report_statistic(tiles))
-        return box
-
-    def exit_app(self):
-        self.stop()
-
-    @staticmethod
-    def report_statistic(tiles):
-        print('On Exit Report')
-        for tile in tiles:
-            print('Tile with %.2f hz:' % (tile.rect_flip_freq / 2))
-            print('Average Absolute Error: %.2f%%' % (np.mean(tile.statistic['error']) * 100))
-            print('Average Absolute FPS: %.2f fps' % np.mean(tile.statistic['fps']))
-
-
-if __name__ == "__main__":
-    Main().run()
