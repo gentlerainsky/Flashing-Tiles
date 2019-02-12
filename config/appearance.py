@@ -15,3 +15,5 @@ LABEL_COLOR = {
     'GREEN': [0, 1, 0, 1],
     'BLUE': [0, 0, 1, 1]
 }
+
+FULL_SCREEN = False
