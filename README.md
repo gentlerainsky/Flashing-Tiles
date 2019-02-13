@@ -32,3 +32,28 @@ Average FPS: 76.62 fps
 3. install all of dependencies with `pipenv install`
 4. enter pipenv environment with `pipenv shell`
 5. start the app with `python main.py`
+
+
+## Config
+
+Look at `config/`, you'll find various config and constant value files.
+
+1. `apprearance.py` will be about general appearance of the app eg. color, whether to show frequency label.
+2. `experiment_setup.py` is the main config file. Here you can set
+    
+    2.1 `scenarios` is where you and new condition for the experiment. Whether to show random word from `word_list`
+    and the frequency of random words. `tiles` is where you add a new tile to the condition.
+    
+    2.2 `break_scenarios` is where you setup what to show during break time between each condition.
+    
+    2.3 `story_setup` is where you set how the overall experiment is run.
+    
+    - `enable_random` for showing each condition in random.
+    - `scenario_order` is if you want to order which condition to show first based on list indexed of `scenarios`.
+    - `scenario_interval` is for setting how long each condition shows.
+    - `break_interval` is for setting how long the break interval is
+
+## TODO
+
+1. Find out how to calibrate frequency
+2. Add a config to run multiple experiment in a row

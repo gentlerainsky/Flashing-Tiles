@@ -4,45 +4,51 @@ from kivy.uix.label import Label
 from kivy.graphics.vertex_instructions import (Rectangle)
 from kivy.graphics.context_instructions import Color
 import random
-from experiment.random_words import words
+
 from config import appearance, experiment_setup
 import math
 
 
 class FlickeringTile(Widget):
-    def __init__(self, config, **kwargs):
+    def __init__(self, tile_config, scene_config, duration, callback, **kwargs):
         super(FlickeringTile, self).__init__(**kwargs)
         self.state = True
         # x, y start from bottom left
-        self.rect_x = config['x']
-        self.rect_y = config['y']
-        self.rect_width = config.get('width')
-        self.rect_height = config.get('height')
-        self.rect_relative_size = config.get('size', 0.2)
-        # 1 hz has 2 flips (eg. black -> white -> black is called 1 time)
-        self.rect_flip_freq = config['hz'] * 2
-        self.hz = config['hz']
-        self.padding = config.get('pad', 30)
+        self.rect_x = tile_config['x']
+        self.rect_y = tile_config['y']
+        self.rect_width = tile_config.get('width')
+        self.rect_height = tile_config.get('height')
+        self.rect_relative_size = tile_config.get('size', 0.2)
+        # 1 frequency has 2 flips (eg. black -> white -> black is called 1 time)
+        self.rect_flip_freq = tile_config['frequency'] * 2
+        self.frequency = tile_config['frequency']
+        self.padding = tile_config.get('pad', 30)
+        self.words = scene_config['word_list']
+        self.callback = callback
         self.rect_event = Clock.schedule_interval(
-            lambda time_passed: self.flick(time_passed), 1 / (self.rect_flip_freq + experiment_setup.caribrate_time)
+            lambda time_passed: self.flick(time_passed), 1 / (self.rect_flip_freq + experiment_setup.calibrate_time)
         )
         self.change_text_event = Clock.schedule_interval(
             lambda time_passed: self.change_text(), 1
+        )
+        self.finish_flickering = Clock.schedule_once(
+            self.finish, duration
         )
         self.canvas.clear()
 
         # Use for further analysis on statistic of diff and fps
         self.statistic = {
-            'period': [],
-            'error': [],
-            'fps': []
+            'frequency': self.frequency,
+            'data': {
+                'period': [],
+                'error': [],
+                'fps': []
+            }
         }
-        self.label_frequency = Label(text=str(self.hz) + ' Hz', font_size=30)
-        self.label_1 = Label(text=str(self.rect_flip_freq), font_size=100)
-        self.label_2 = Label(text=str(self.rect_flip_freq), font_size=100)
-
-        # self.flick(0.5)
-        # self.bind(pos=lambda a,b:self.flick(0.5), size=lambda a,b:self.flick(0.5))
+        if appearance.SHOW_TILE_FREQUENCY_LABEL:
+            self.label_frequency = Label(text=str(self.frequency) + ' frequency', font_size=30)
+        self.label_1 = Label(text='', font_size=100)
+        self.label_2 = Label(text='', font_size=100)
 
     # try to make the tiles look most pretty by calculate to position of it
     # base on screen size and tile size
@@ -71,16 +77,17 @@ class FlickeringTile(Widget):
 
     def change_text(self):
         # self.label_1.text = self.label_2.text = str(random.randint(0, 100))
-        self.label_1.text = self.label_2.text = random.choice(words)
+        if self.words:
+            self.label_1.text = self.label_2.text = random.choice(self.words)
 
     def flick(self, time_passed):
-        self.statistic['period'].append(time_passed * 2)
-        self.statistic['error'].append(math.fabs((1 / time_passed - self.rect_flip_freq) / self.rect_flip_freq))
+        self.statistic['data']['period'].append(time_passed * 2)
+        self.statistic['data']['error'].append(math.fabs((1 / time_passed - self.rect_flip_freq) / self.rect_flip_freq))
         fps = Clock.get_rfps()
         # Ignore FPS of a few first frames which are 0
         # (fps of Kivy needs some initial frame before reporting the value for us)
         if fps > 0:
-            self.statistic['fps'].append(fps)
+            self.statistic['data']['fps'].append(fps)
         size = self.get_size()
         pos = self.get_pos()
         label_pos = self.get_label_pos()
@@ -108,9 +115,17 @@ class FlickeringTile(Widget):
                 self.add_widget(
                     self.label_2
                 )
-            self.remove_widget(self.label_frequency)
-            self.label_frequency.pos = pos
-            self.add_widget(
-                self.label_frequency
-            )
+            if appearance.SHOW_TILE_FREQUENCY_LABEL:
+                self.remove_widget(self.label_frequency)
+                self.label_frequency.pos = pos
+                self.add_widget(
+                    self.label_frequency
+                )
             self.state = not self.state
+
+    def finish(self, _):
+        with self.canvas:
+            self.canvas.clear()
+        self.rect_event.cancel()
+        self.change_text_event.cancel()
+        self.callback(statistic=self.statistic)
