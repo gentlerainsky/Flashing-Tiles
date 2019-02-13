@@ -36,11 +36,11 @@ break_scenario = {
 }
 
 story_setup = {
-    "enable_start_screen": False,
+    "enable_start_screen": True,
     "enable_random": True,
     "scenario_order": [],
-    "break_interval": 2,
-    "scenario_interval": 3,
+    "break_interval": 5,
+    "scenario_interval": 10,
     "scenarios": scenarios,
     "break_scenario": break_scenario
 }

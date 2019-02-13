@@ -9,6 +9,7 @@ class Scenario:
         self.current_finish_actor = 0
         self.container = container
         self.duration = duration
+        self.statistics = []
         self.callback = callback
 
     def play(self):
@@ -25,8 +26,10 @@ class Scenario:
             tiles.append(tile)
             self.container.add_widget(tile)
 
-    def finish_one(self):
+    def finish_one(self, statistic=None):
         self.current_finish_actor += 1
+        if statistic is not None and len(statistic) > 0:
+            self.statistics.append(statistic)
         if self.current_finish_actor >= self.total_actor:
             self.current_finish_actor = 0
-            self.callback()
+            self.callback(statistics=self.statistics)

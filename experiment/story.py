@@ -1,4 +1,6 @@
 from experiment.scenario import Scenario
+from experiment.start_screen import StartScreen
+from experiment.statistics import Statistic
 import random
 import logging
 
@@ -23,6 +25,7 @@ class Story:
         self.break_scenario = story_setup['break_scenario']
         self.story_line = []
         self.callback = callback
+        self.statistics = Statistic()
         self.generate_story_line()
         self.progress_story()
 
@@ -54,12 +57,18 @@ class Story:
         # we reverse this to make it easier to be popped in self.progress_story()
         self.story_line = list(reversed(self.story_line))
 
-    def progress_story(self):
+    def progress_story(self, statistics=()):
+        if statistics is not None and len(statistics) > 0:
+            for data in statistics:
+                self.statistics.add_data(data)
+
         # we reverse the story line to make it easier to pop
         # the first scenario in our loop
         if len(self.story_line) > 0:
             scene = self.story_line.pop()
             logger.info(f'playing {scene}')
+            if scene['type'] == ScreenType.START_SCREEN:
+                StartScreen(self.container, self.progress_story)
             if scene['type'] == ScreenType.EXPERIMENT_SCENARIO:
                 logger.info(f'running a scenario id:{scene["scenario_id"]}')
                 Scenario(
@@ -78,4 +87,11 @@ class Story:
                 ).play()
         else:
             logger.info(f'finish experiment')
-            self.callback()
+            self.finish()
+
+    def report_statistic(self):
+        self.statistics.report()
+
+    def finish(self):
+        self.report_statistic()
+        self.callback()
