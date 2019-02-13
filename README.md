@@ -11,18 +11,26 @@ and also provide faster update rate. Below are error rates of the frequency of e
 
 ```
 On Exit Report
-Tile with 6.00 hz:
-Average Absolute Error: 6.28%
-Average FPS: 76.67 fps
-Tile with 6.57 hz:
-Average Absolute Error: 4.43%
-Average FPS: 76.63 fps
-Tile with 7.50 hz:
-Average Absolute Error: 3.55%
-Average FPS: 76.65 fps
-Tile with 8.57 hz:
-Average Absolute Error: 9.86%
-Average FPS: 76.62 fps
+[Tile with 6.00 hz]
+[Average Frequency] 5.8857
+[Average Absolute Error] 5.84%
+[SD of Frequency] 0.01
+[Average Absolute FPS] 78.30 fps
+[Tile with 6.57 hz]
+[Average Frequency] 6.4873
+[Average Absolute Error] 2.52%
+[SD of Frequency] 0.00
+[Average Absolute FPS] 78.33 fps
+[Tile with 7.50 hz]
+[Average Frequency] 7.6741
+[Average Absolute Error] 3.72%
+[SD of Frequency] 0.00
+[Average Absolute FPS] 78.33 fps
+[Tile with 8.57 hz]
+[Average Frequency] 8.0253
+[Average Absolute Error] 8.44%
+[SD of Frequency] 0.01
+[Average Absolute FPS] 78.31 fps
 ```
 
 ## Installation
