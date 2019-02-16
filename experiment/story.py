@@ -3,6 +3,8 @@ from experiment.start_screen import StartScreen
 from experiment.statistics import Statistic
 import random
 import logging
+import math
+from config.experiment_setup import guide_arrows
 
 logger = logging.getLogger('FLASHING_EXPERIMENT')
 
@@ -16,6 +18,7 @@ class ScreenType:
 class Story:
     def __init__(self, container, story_setup, callback):
         self.container = container
+        self.num_episode = story_setup['num_episode']
         self.break_interval = story_setup['break_interval']
         self.scenario_interval = story_setup['scenario_interval']
         self.scenarios = story_setup['scenarios']
@@ -29,6 +32,31 @@ class Story:
         self.generate_story_line()
         self.progress_story()
 
+    def generate_random_guiding(self):
+        num_round = math.ceil(self.num_episode / len(guide_arrows))
+        random_guiding = []
+        for scenario in range(len(self.scenarios)):
+            scenario_guiding = []
+            for _ in range(num_round):
+                guiding = guide_arrows.copy()
+                random.shuffle(guiding)
+                scenario_guiding += guiding
+            random_guiding.append(scenario_guiding)
+        return random_guiding
+
+    def generate_story_line_sequence(self):
+        sequence = []
+        for episode in range(self.num_episode):
+            if self.enable_random:
+                sub_sequence = [i for i in range(len(self.scenarios))]
+                random.shuffle(sub_sequence)
+            else:
+                sub_sequence = self.scenario_order * self.num_episode
+                # we will reverse this again at the end
+                sub_sequence.reverse()
+            sequence.append(sub_sequence)
+        return sequence
+
     def generate_story_line(self):
         # reset story line
         self.story_line = []
@@ -36,24 +64,27 @@ class Story:
             self.story_line.append({
                 'type': ScreenType.START_SCREEN
             })
-        if self.enable_random:
-            sequence = [i for i in range(len(self.scenarios))]
-            random.shuffle(sequence)
-        else:
-            sequence = self.scenario_order
-            # we will reverse this again at the end
-            sequence.reverse()
-        logger.info(f'start a new experiment with {len(sequence)} scenarios with break time between each scenario')
-        for index in range(len(sequence)):
-            self.story_line.append({
-                'index': index,
-                'type': ScreenType.BREAK_TIME
-            })
-            self.story_line.append({
-                'index': index,
-                'type': ScreenType.EXPERIMENT_SCENARIO,
-                'scenario_id': sequence[index]
-            })
+        episodes = self.generate_story_line_sequence()
+        random_guiding = self.generate_random_guiding()
+        logger.info(
+            f'start a new experiment running each condition for {len(episodes)} ' +
+            'times with break time between each scenario'
+        )
+        for episode in range(len(episodes)):
+            guiding_index = 0
+            for index in range(len(episodes[episode])):
+                self.story_line.append({
+                    'index': index,
+                    'type': ScreenType.BREAK_TIME
+                })
+                self.story_line.append({
+                    'index': index,
+                    'arrow_direction': random_guiding[guiding_index][episode],
+                    'arrow_color': '',
+                    'type': ScreenType.EXPERIMENT_SCENARIO,
+                    'scenario_id': episodes[episode][index]
+                })
+                guiding_index += 1
         # we reverse this to make it easier to be popped in self.progress_story()
         self.story_line = list(reversed(self.story_line))
 
@@ -75,14 +106,18 @@ class Story:
                     self.container,
                     self.scenarios[scene['scenario_id']],
                     self.scenario_interval,
+                    self.scenarios[scene['scenario_id']]['enable_guide_arrow'],
+                    self.scenarios[scene['scenario_id']]['guide_arrow_color'],
                     self.progress_story
-                ).play()
+                ).play(scene['arrow_direction'])
             elif scene['type'] == ScreenType.BREAK_TIME:
                 logger.info(f'break time')
                 Scenario(
                     self.container,
                     self.break_scenario,
                     self.break_interval,
+                    None,
+                    None,
                     self.progress_story
                 ).play()
         else:

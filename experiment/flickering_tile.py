@@ -49,6 +49,8 @@ class FlickeringTile(Widget):
             self.label_frequency = Label(text=str(self.frequency) + ' frequency', font_size=30)
         self.label_1 = Label(text='', font_size=100)
         self.label_2 = Label(text='', font_size=100)
+        # to init text on each label
+        self.change_text()
 
     # try to make the tiles look most pretty by calculate to position of it
     # base on screen size and tile size

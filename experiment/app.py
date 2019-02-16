@@ -15,13 +15,17 @@ if appearance.FULL_SCREEN:
 
 
 class Main(App):
+    def __init__(self, **kwargs):
+        super(Main, self).__init__(**kwargs)
+        self.box = FloatLayout()
+
     def build(self):
-        box = FloatLayout()
-        Story(box, experiment_setup.story_setup, self.exit_app)
-        return box
+        Story(self.box, experiment_setup.story_setup, self.exit_app)
+        return self.box
 
     def exit_app(self):
-        self.stop()
+        self.box.clear_widgets()
+        self.build()
 
 
 if __name__ == "__main__":
