@@ -59,7 +59,9 @@ Look at `config/`, you'll find various config and constant value files.
     - `enable_random` for showing each condition in random.
     - `scenario_order` is if you want to order which condition to show first based on list indexed of `scenarios`.
     - `scenario_interval` is for setting how long each condition shows.
-    - `break_interval` is for setting how long the break interval is
+    - `break_interval` is for setting how long the break interval is.
+    - `num_episode` is for setting how many series of experiment will be run. For example, if you put 4 here
+    with 3 scenarios, the program will play these 3 scenarios for 4 times.
 
 ## TODO
 
