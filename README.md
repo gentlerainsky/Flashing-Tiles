@@ -41,6 +41,14 @@ On Exit Report
 4. enter pipenv environment with `pipenv shell`
 5. start the app with `python main.py`
 
+## Default Experiment Sequence
+
+1. Start with resting for 20s
+2. Start first trial
+3. Instruction of the first random condition for 5s
+4. Play the first random condition for 10s
+5. Repeat 3. and 4. until all three condition are shown
+6. Repeat 3. to 5. for 12 trials
 
 ## Config
 
@@ -66,4 +74,3 @@ Look at `config/`, you'll find various config and constant value files.
 ## TODO
 
 1. Find out how to calibrate frequency
-2. Add a config to run multiple experiment in a row

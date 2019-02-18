@@ -1,10 +1,12 @@
 from experiment.scenario import Scenario
 from experiment.start_screen import StartScreen
+from experiment.text_screen import TextScreen
 from experiment.statistics import Statistic
 import random
 import logging
 import math
 from config.experiment_setup import guide_arrows
+from config.appearance import ARROW_SIZE
 
 logger = logging.getLogger('FLASHING_EXPERIMENT')
 
@@ -13,6 +15,7 @@ class ScreenType:
     START_SCREEN = 0
     EXPERIMENT_SCENARIO = 1
     BREAK_TIME = 2
+    INSTRUCTION_SCREEN = 3
 
 
 class Story:
@@ -21,6 +24,7 @@ class Story:
         self.num_episode = story_setup['num_episode']
         self.break_interval = story_setup['break_interval']
         self.scenario_interval = story_setup['scenario_interval']
+        self.instruction_interval = story_setup['instruction_interval']
         self.scenarios = story_setup['scenarios']
         self.enable_random = story_setup['enable_random']
         self.enable_start_screen = story_setup['enable_start_screen']
@@ -72,15 +76,19 @@ class Story:
         )
         for episode in range(len(episodes)):
             guiding_index = 0
+            self.story_line.append({
+                'type': ScreenType.BREAK_TIME
+            })
             for index in range(len(episodes[episode])):
                 self.story_line.append({
                     'index': index,
-                    'type': ScreenType.BREAK_TIME
+                    'arrow_direction': random_guiding[guiding_index][episode],
+                    'type': ScreenType.INSTRUCTION_SCREEN,
+                    'scenario_id': episodes[episode][index]
                 })
                 self.story_line.append({
                     'index': index,
                     'arrow_direction': random_guiding[guiding_index][episode],
-                    'arrow_color': '',
                     'type': ScreenType.EXPERIMENT_SCENARIO,
                     'scenario_id': episodes[episode][index]
                 })
@@ -100,26 +108,37 @@ class Story:
             logger.info(f'playing {scene}')
             if scene['type'] == ScreenType.START_SCREEN:
                 StartScreen(self.container, self.progress_story)
+            if scene['type'] == ScreenType.INSTRUCTION_SCREEN:
+                TextScreen(
+                    self.container,
+                    self.scenarios[scene['scenario_id']]['condition_id'],
+                    self.scenarios[scene['scenario_id']]['instruction_text'],
+                    scene['arrow_direction'],
+                    self.scenarios[scene['scenario_id']]['guide_arrow_color'],
+                    ARROW_SIZE,
+                    self.instruction_interval,
+                    self.progress_story
+                )
             if scene['type'] == ScreenType.EXPERIMENT_SCENARIO:
                 logger.info(f'running a scenario id:{scene["scenario_id"]}')
                 Scenario(
                     self.container,
                     self.scenarios[scene['scenario_id']],
                     self.scenario_interval,
-                    self.scenarios[scene['scenario_id']]['enable_guide_arrow'],
-                    self.scenarios[scene['scenario_id']]['guide_arrow_color'],
-                    self.progress_story
-                ).play(scene['arrow_direction'])
-            elif scene['type'] == ScreenType.BREAK_TIME:
-                logger.info(f'break time')
-                Scenario(
-                    self.container,
-                    self.break_scenario,
-                    self.break_interval,
-                    None,
-                    None,
                     self.progress_story
                 ).play()
+            elif scene['type'] == ScreenType.BREAK_TIME:
+                logger.info(f'break time')
+                TextScreen(
+                    container=self.container,
+                    condition_id=None,
+                    instruction_text=f"Rest time for {self.break_interval}s",
+                    arrow_direction=None,
+                    arrow_color=None,
+                    arrow_size=None,
+                    duration=self.break_interval,
+                    callback=self.progress_story
+                )
         else:
             logger.info(f'finish experiment')
             self.finish()

@@ -4,7 +4,8 @@ from kivy.clock import Clock
 
 
 class Scenario:
-    def __init__(self, container, scenario_setup, duration, enable_arrow=None, arrow_color=None, callback=None):
+    # def __init__(self, container, scenario_setup, duration, enable_arrow=None, arrow_color=None, callback=None):
+    def __init__(self, container, scenario_setup, duration, callback=None):
         self.setup = scenario_setup
         self.total_actor = len(self.setup['tiles'])
         self.current_finish_actor = 0
@@ -12,15 +13,15 @@ class Scenario:
         self.duration = duration
         self.statistics = []
         self.callback = callback
-        self.arrow = None
-        self.enable_arrow = enable_arrow
-        self.arrow_color = arrow_color
+        # self.arrow = None
+        # self.enable_arrow = enable_arrow
+        # self.arrow_color = arrow_color
 
-    def play(self, direction=None):
+    def play(self):
         tiles = []
-        if self.enable_arrow:
-            self.arrow = GuideArrow(direction, self.arrow_color, 0.1)
-            self.container.add_widget(self.arrow)
+        # if self.enable_arrow:
+        #     self.arrow = GuideArrow(direction, self.arrow_color, 0.1)
+        #     self.container.add_widget(self.arrow)
         if len(self.setup['tiles']) == 0:
             return Clock.schedule_once(lambda _: self.finish_one(), self.duration)
         for tile_config in self.setup['tiles']:
@@ -38,7 +39,7 @@ class Scenario:
         if statistic is not None and len(statistic) > 0:
             self.statistics.append(statistic)
         if self.current_finish_actor >= self.total_actor:
-            if self.arrow is not None:
-                self.arrow.finish()
+            # if self.arrow is not None:
+            #     self.arrow.finish()
             self.current_finish_actor = 0
             self.callback(statistics=self.statistics)

@@ -1,3 +1,4 @@
+from kivy.core.window import Window
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.config import Config
@@ -11,8 +12,10 @@ logger.info('Set max FPS to', Config.get('graphics', 'maxfps'))
 # Config.set('kivy', 'log_level', 'error')
 # Config.set("kivy", "log_enable", "0")
 if appearance.FULL_SCREEN:
-    Config.set('graphics', 'fullscreen', 'auto')
+#     Config.set('graphics', 'fullscreen', 'auto')
+# print('FULL_SCREEN', appearance.FULL_SCREEN)
 
+    Window.fullscreen = 'auto'
 
 class Main(App):
     def __init__(self, **kwargs):
@@ -20,10 +23,10 @@ class Main(App):
         self.box = FloatLayout()
 
     def build(self):
-        Story(self.box, experiment_setup.story_setup, self.exit_app)
+        Story(self.box, experiment_setup.story_setup, self.restart_app)
         return self.box
 
-    def exit_app(self):
+    def restart_app(self):
         self.box.clear_widgets()
         self.build()
 

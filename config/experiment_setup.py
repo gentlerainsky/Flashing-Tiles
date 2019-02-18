@@ -5,8 +5,11 @@ calibrate_time = 0
 scenarios = [{
     "enable_guide_arrow": True,
     "guide_arrow_color": "RED",
+    "condition_id": 3,
+    "instruction_text": 'Focus on "word"',
     "scene": {
         "word_list": words,
+        "is_word_random": False,
         "word_change_frequency": 1,
     },
     "tiles": [
@@ -16,8 +19,10 @@ scenarios = [{
         {'x': 'middle', 'y': 'bottom', 'frequency': 8.57}
     ]
 }, {
-    "enable_guide_arrow": False,
-    "guide_arrow_color": None,
+    "enable_guide_arrow": True,
+    "guide_arrow_color": "BLUE",
+    "condition_id": 2,
+    "instruction_text": 'Focus on "square"',
     "scene": {
         "word_list": None,
     },
@@ -30,8 +35,11 @@ scenarios = [{
 }, {
     "enable_guide_arrow": True,
     "guide_arrow_color": "GREEN",
+    "condition_id": 1,
+    "instruction_text": 'Focus on "square"',
     "scene": {
         "word_list": words,
+        "is_word_random": False
     },
     "tiles": [
         {'x': 'middle', 'y': 'top', 'frequency': 6},
@@ -47,12 +55,14 @@ break_scenario = {
 }
 
 story_setup = {
-    "num_episode": 4,
+    "num_episode": 12,
     "enable_start_screen": True,
     "enable_random": True,
     "scenario_order": [],
     # in second
-    "break_interval": 5,
+    "break_interval": 20,
+    # in second
+    "instruction_interval": 5,
     # in second
     "scenario_interval": 10,
     "scenarios": scenarios,

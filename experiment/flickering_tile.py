@@ -18,12 +18,14 @@ class FlickeringTile(Widget):
         self.rect_y = tile_config['y']
         self.rect_width = tile_config.get('width')
         self.rect_height = tile_config.get('height')
-        self.rect_relative_size = tile_config.get('size', 0.2)
+        self.rect_relative_size = tile_config.get('size', 0.15)
         # 1 frequency has 2 flips (eg. black -> white -> black is called 1 time)
         self.rect_flip_freq = tile_config['frequency'] * 2
         self.frequency = tile_config['frequency']
         self.padding = tile_config.get('pad', 30)
         self.words = scene_config['word_list']
+        self.is_word_random = scene_config.get('is_word_random', False)
+        self.word_index = 0
         self.callback = callback
         self.rect_event = Clock.schedule_interval(
             lambda time_passed: self.flick(time_passed), 1 / (self.rect_flip_freq + experiment_setup.calibrate_time)
@@ -47,8 +49,8 @@ class FlickeringTile(Widget):
         }
         if appearance.SHOW_TILE_FREQUENCY_LABEL:
             self.label_frequency = Label(text=str(self.frequency) + ' frequency', font_size=30)
-        self.label_1 = Label(text='', font_size=100)
-        self.label_2 = Label(text='', font_size=100)
+        self.label_1 = Label(text='')
+        self.label_2 = Label(text='')
         # to init text on each label
         self.change_text()
 
@@ -79,8 +81,15 @@ class FlickeringTile(Widget):
 
     def change_text(self):
         # self.label_1.text = self.label_2.text = str(random.randint(0, 100))
-        if self.words:
+        if self.words is None:
+            return None
+        if self.is_word_random:
             self.label_1.text = self.label_2.text = random.choice(self.words)
+        else:
+            self.label_1.text = self.label_2.text = self.words[self.word_index]
+            self.word_index += 1
+            if self.word_index > len(self.words):
+                self.word_index = 0
 
     def flick(self, time_passed):
         self.statistic['data']['period'].append(time_passed * 2)
@@ -104,7 +113,7 @@ class FlickeringTile(Widget):
             if self.state:
                 self.remove_widget(self.label_2)
                 self.label_1.pos = label_pos
-                self.label_1.font_size = size[1] / 5
+                self.label_1.font_size = size[1] * appearance.TILE_FONT_SIZE_RATIO
                 self.label_1.color = appearance.LABEL_COLOR['BLACK']
                 self.add_widget(
                     self.label_1
@@ -112,7 +121,7 @@ class FlickeringTile(Widget):
             else:
                 self.remove_widget(self.label_1)
                 self.label_2.pos = label_pos
-                self.label_2.font_size = size[1] / 5
+                self.label_2.font_size = size[1] * appearance.TILE_FONT_SIZE_RATIO
                 self.label_2.color = appearance.LABEL_COLOR['WHITE']
                 self.add_widget(
                     self.label_2
