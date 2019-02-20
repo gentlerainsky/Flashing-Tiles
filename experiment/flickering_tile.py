@@ -69,10 +69,11 @@ class FlickeringTile(Widget):
         if self.rect_x and self.rect_y:
             return self.rect_x, self.rect_y
 
-    def get_label_pos(self):
+    def get_label_pos(self, text_size):
         x, y = self.get_pos()
         width, height = self.get_size()
-        return (x + width / 2 - self.padding), (y + height / 2 - self.padding)
+        text_width, text_height = text_size
+        return (x + width / 2 - text_width / 2), (y + height / 2 - text_height / 2)
 
     def get_size(self):
         if self.rect_width and self.rect_height:
@@ -101,7 +102,6 @@ class FlickeringTile(Widget):
             self.statistic['data']['fps'].append(fps)
         size = self.get_size()
         pos = self.get_pos()
-        label_pos = self.get_label_pos()
         with self.canvas:
             self.canvas.clear()
             if self.state:
@@ -112,20 +112,19 @@ class FlickeringTile(Widget):
 
             if self.state:
                 self.remove_widget(self.label_2)
-                self.label_1.pos = label_pos
+                self.label_1.pos = self.get_label_pos(self.label_1.texture_size)
                 self.label_1.font_size = size[1] * appearance.TILE_FONT_SIZE_RATIO
+                self.label_1.size = self.label_1.texture_size
                 self.label_1.color = appearance.LABEL_COLOR['BLACK']
-                self.add_widget(
-                    self.label_1
-                )
+                self.add_widget(self.label_1)
             else:
                 self.remove_widget(self.label_1)
-                self.label_2.pos = label_pos
+                self.label_2.pos = self.get_label_pos(self.label_2.texture_size)
                 self.label_2.font_size = size[1] * appearance.TILE_FONT_SIZE_RATIO
+                self.label_2.size = self.label_2.texture_size
                 self.label_2.color = appearance.LABEL_COLOR['WHITE']
-                self.add_widget(
-                    self.label_2
-                )
+                self.add_widget(self.label_2)
+
             if appearance.SHOW_TILE_FREQUENCY_LABEL:
                 self.remove_widget(self.label_frequency)
                 self.label_frequency.pos = pos
